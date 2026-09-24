@@ -84,10 +84,7 @@ export default function AuditLogIndex({ logs, actions, users, filters }: AuditLo
     return (
         <AppLayout
             title="Log Audit Sistem"
-            breadcrumbs={[
-                { label: "Dashboard", href: "/dashboard" },
-                { label: "Log Audit" },
-            ]}
+            breadcrumbs={[{ label: "Log Audit" }]}
         >
             <div className="space-y-6">
                 <div>
@@ -100,7 +97,7 @@ export default function AuditLogIndex({ logs, actions, users, filters }: AuditLo
                 </div>
 
                 {/* Filters */}
-                <div className="bg-white dark:bg-slate-900 p-4 rounded-2xl border border-slate-200/80 dark:border-slate-800 shadow-xs flex flex-col md:flex-row items-center gap-3">
+                <div className="bg-white dark:bg-slate-900 p-4 rounded-2xl border border-slate-200/80 dark:border-slate-800 shadow-xs flex flex-col md:flex-row items-stretch md:items-center gap-3">
                     <form onSubmit={handleSearchSubmit} className="relative flex-1 w-full">
                         <Search className="w-4 h-4 text-slate-400 absolute left-3.5 top-1/2 -translate-y-1/2" />
                         <Input
@@ -111,14 +108,14 @@ export default function AuditLogIndex({ logs, actions, users, filters }: AuditLo
                         />
                     </form>
 
-                    <div className="flex items-center gap-2 w-full md:w-auto">
+                    <div className="grid grid-cols-2 md:flex md:items-center gap-2 w-full md:w-auto">
                         <select
                             value={action}
                             onChange={(e) => {
                                 setAction(e.target.value);
                                 applyFilters(search, e.target.value, userId);
                             }}
-                            className="h-9 px-3 text-xs bg-slate-50 dark:bg-slate-800/50 border border-slate-200 dark:border-slate-800 rounded-xl focus:outline-hidden focus:ring-2 focus:ring-primary/20 text-slate-700 dark:text-slate-300"
+                            className="h-9 px-3 text-xs bg-slate-50 dark:bg-slate-800/50 border border-slate-200 dark:border-slate-800 rounded-xl focus:outline-hidden focus:ring-2 focus:ring-primary/20 text-slate-700 dark:text-slate-300 w-full"
                         >
                             <option value="">Semua Aksi</option>
                             {actions.map((act) => (
@@ -134,7 +131,7 @@ export default function AuditLogIndex({ logs, actions, users, filters }: AuditLo
                                 setUserId(e.target.value);
                                 applyFilters(search, action, e.target.value);
                             }}
-                            className="h-9 px-3 text-xs bg-slate-50 dark:bg-slate-800/50 border border-slate-200 dark:border-slate-800 rounded-xl focus:outline-hidden focus:ring-2 focus:ring-primary/20 text-slate-700 dark:text-slate-300"
+                            className="h-9 px-3 text-xs bg-slate-50 dark:bg-slate-800/50 border border-slate-200 dark:border-slate-800 rounded-xl focus:outline-hidden focus:ring-2 focus:ring-primary/20 text-slate-700 dark:text-slate-300 w-full"
                         >
                             <option value="">Semua Pengguna</option>
                             {users.map((u) => (
@@ -148,7 +145,8 @@ export default function AuditLogIndex({ logs, actions, users, filters }: AuditLo
 
                 {/* Audit Logs Table */}
                 <div className="bg-white dark:bg-slate-900 rounded-2xl border border-slate-200/80 dark:border-slate-800 shadow-xs overflow-hidden">
-                    <div className="overflow-x-auto">
+                    {/* Desktop Table */}
+                    <div className="hidden md:block overflow-x-auto">
                         <table className="w-full text-left text-xs">
                             <thead className="bg-slate-50/75 dark:bg-slate-800/40 border-b border-slate-100 dark:border-slate-800 text-slate-400 font-semibold uppercase">
                                 <tr>
@@ -213,13 +211,60 @@ export default function AuditLogIndex({ logs, actions, users, filters }: AuditLo
                         </table>
                     </div>
 
+                    {/* Mobile Stacked List */}
+                    <div className="md:hidden divide-y divide-slate-100 dark:divide-slate-800">
+                        {logs.data.length === 0 ? (
+                            <div className="py-12 text-center text-slate-400 text-sm">
+                                Tidak ada catatan log audit yang ditemukan.
+                            </div>
+                        ) : (
+                            logs.data.map((log) => (
+                                <div key={log.id} className="p-4 space-y-2">
+                                    <div className="flex items-start justify-between gap-2">
+                                        <span className={`inline-block px-2.5 py-0.5 rounded-md font-mono text-[11px] font-semibold border ${getActionBadgeClass(log.action)}`}>
+                                            {log.action}
+                                        </span>
+                                        <Button
+                                            variant="ghost"
+                                            size="sm"
+                                            onClick={() => setSelectedLog(log)}
+                                            className="h-7 text-xs gap-1 shrink-0"
+                                        >
+                                            <Eye className="w-3.5 h-3.5" />
+                                            <span>Lihat</span>
+                                        </Button>
+                                    </div>
+                                    <div className="text-xs">
+                                        {log.user ? (
+                                            <div>
+                                                <span className="font-semibold text-slate-800 dark:text-slate-200">{log.user.name}</span>
+                                                <span className="text-slate-400 ml-1">({log.user.email})</span>
+                                            </div>
+                                        ) : (
+                                            <span className="text-slate-400 italic">Sistem / Tamu</span>
+                                        )}
+                                    </div>
+                                    <div className="flex items-center justify-between text-[11px] text-slate-400">
+                                        <span className="font-mono">{log.ip_address || "-"}</span>
+                                        <span className="font-mono">
+                                            {new Date(log.created_at).toLocaleString("id-ID", {
+                                                dateStyle: "short",
+                                                timeStyle: "short",
+                                            })}
+                                        </span>
+                                    </div>
+                                </div>
+                            ))
+                        )}
+                    </div>
+
                     {/* Pagination */}
                     {logs.links && logs.links.length > 3 && (
-                        <div className="flex items-center justify-between px-4 py-3 border-t border-slate-100 dark:border-slate-800 text-xs">
+                        <div className="flex flex-col sm:flex-row items-center sm:justify-between gap-2 px-4 py-3 border-t border-slate-100 dark:border-slate-800 text-xs">
                             <span className="text-slate-500">
                                 Menampilkan {logs.from || 0} - {logs.to || 0} dari {logs.total} log
                             </span>
-                            <div className="flex gap-1">
+                            <div className="flex gap-1 overflow-x-auto max-w-full pb-1">
                                 {logs.links.map((link, idx) => (
                                     <Button
                                         key={idx}
@@ -227,7 +272,7 @@ export default function AuditLogIndex({ logs, actions, users, filters }: AuditLo
                                         disabled={!link.url}
                                         variant={link.active ? "default" : "outline"}
                                         size="sm"
-                                        className="h-8 px-3 text-xs"
+                                        className="h-8 px-3 text-xs shrink-0"
                                     >
                                         {link.url ? (
                                             <Link

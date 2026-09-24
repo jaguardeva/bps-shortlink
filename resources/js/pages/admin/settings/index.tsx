@@ -36,10 +36,7 @@ export default function SettingsIndex({ settings }: SettingsIndexProps) {
     return (
         <AppLayout
             title="Pengaturan Sistem"
-            breadcrumbs={[
-                { label: "Dashboard", href: "/dashboard" },
-                { label: "Pengaturan" },
-            ]}
+            breadcrumbs={[{ label: "Pengaturan Sistem" }]}
         >
             <div className="max-w-3xl mx-auto space-y-6">
                 <div>

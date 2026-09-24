@@ -58,10 +58,14 @@ export default function AnalyticsIndex({
     return (
         <AppLayout
             title={targetUser ? `Statistik: ${targetUser.name}` : "Statistik & Analisis"}
-            breadcrumbs={[
-                { label: "Dashboard", href: "/dashboard" },
-                { label: targetUser ? `Statistik (${targetUser.name})` : "Analisis" },
-            ]}
+            breadcrumbs={
+                targetUser
+                    ? [
+                          { label: "Statistik & Analisis", href: "/analytics" },
+                          { label: targetUser.name },
+                      ]
+                    : [{ label: "Statistik & Analisis" }]
+            }
         >
             <div className="space-y-6">
                 {/* Header & Period Filter */}
@@ -77,7 +81,7 @@ export default function AnalyticsIndex({
                         </p>
                     </div>
 
-                    <div className="flex items-center gap-1.5 p-1 bg-slate-100 dark:bg-slate-800 rounded-xl">
+                    <div className="flex items-center gap-1.5 p-1 bg-slate-100 dark:bg-slate-800 rounded-xl flex-wrap">
                         {[
                             { key: "7d", label: "7 Hari" },
                             { key: "30d", label: "30 Hari" },
@@ -184,13 +188,13 @@ export default function AnalyticsIndex({
                         </div>
                     ) : (
                         <div className="pt-6">
-                            <div className="h-56 w-full flex items-end gap-2 sm:gap-3 overflow-x-auto pb-4">
+                            <div className="h-56 w-full flex items-end gap-1 sm:gap-3 overflow-x-auto pb-4">
                                 {clicksOverTime.map((item, idx) => {
                                     const heightPercent = Math.max((item.total / maxClick) * 100, 6);
                                     return (
                                         <div
                                             key={idx}
-                                            className="flex-1 min-w-[28px] max-w-[48px] flex flex-col items-center gap-2 group relative"
+                                            className="flex-1 min-w-[18px] sm:min-w-[28px] max-w-[48px] flex flex-col items-center gap-2 group relative"
                                         >
                                             <div className="opacity-0 group-hover:opacity-100 absolute -top-10 transition-opacity bg-slate-900 text-white dark:bg-white dark:text-slate-900 text-[11px] py-1 px-2 rounded pointer-events-none whitespace-nowrap z-10 shadow-lg">
                                                 {item.date}: {item.total} klik ({item.unique_clicks} unik)
@@ -206,7 +210,7 @@ export default function AnalyticsIndex({
                                                     }}
                                                 />
                                             </div>
-                                            <span className="text-[10px] text-slate-400 font-mono transform -rotate-45 origin-top-left mt-2 truncate w-8 block">
+                                            <span className="text-[10px] text-slate-400 font-mono transform -rotate-45 origin-top-left mt-2 truncate w-8 block hidden sm:block">
                                                 {item.date.slice(5)}
                                             </span>
                                         </div>
@@ -328,46 +332,80 @@ export default function AnalyticsIndex({
                             Belum ada tautan yang dibuat.
                         </div>
                     ) : (
-                        <div className="overflow-x-auto">
-                            <table className="w-full text-left text-xs">
-                                <thead>
-                                    <tr className="border-b border-slate-100 dark:border-slate-800 text-slate-400 font-semibold uppercase">
-                                        <th className="pb-3">Tautan & Judul</th>
-                                        <th className="pb-3">Tujuan</th>
-                                        <th className="pb-3 text-right">Total Klik</th>
-                                        <th className="pb-3 text-right">Aksi</th>
-                                    </tr>
-                                </thead>
-                                <tbody className="divide-y divide-slate-100 dark:divide-slate-800">
-                                    {topShortlinks.map((link) => (
-                                        <tr key={link.id} className="hover:bg-slate-50/50 dark:hover:bg-slate-800/50 transition-colors">
-                                            <td className="py-3 pr-4">
-                                                <div className="font-semibold text-slate-800 dark:text-slate-200">
+                        <>
+                            {/* Desktop Table */}
+                            <div className="hidden md:block overflow-x-auto">
+                                <table className="w-full text-left text-xs">
+                                    <thead>
+                                        <tr className="border-b border-slate-100 dark:border-slate-800 text-slate-400 font-semibold uppercase">
+                                            <th className="pb-3">Tautan & Judul</th>
+                                            <th className="pb-3">Tujuan</th>
+                                            <th className="pb-3 text-right">Total Klik</th>
+                                            <th className="pb-3 text-right">Aksi</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody className="divide-y divide-slate-100 dark:divide-slate-800">
+                                        {topShortlinks.map((link) => (
+                                            <tr key={link.id} className="hover:bg-slate-50/50 dark:hover:bg-slate-800/50 transition-colors">
+                                                <td className="py-3 pr-4">
+                                                    <div className="font-semibold text-slate-800 dark:text-slate-200">
+                                                        {link.title || link.slug}
+                                                    </div>
+                                                    <div className="font-mono text-primary text-[11px]">
+                                                        link.kanal3516.site/{link.slug}
+                                                    </div>
+                                                </td>
+                                                <td className="py-3 pr-4 max-w-[240px] truncate text-slate-500">
+                                                    {link.destination_url}
+                                                </td>
+                                                <td className="py-3 text-right font-bold text-slate-900 dark:text-slate-100 pr-4">
+                                                    {link.click_count.toLocaleString()}
+                                                </td>
+                                                <td className="py-3 text-right">
+                                                    <Button asChild variant="ghost" size="sm" className="h-7 text-xs gap-1">
+                                                        <Link href={`/analytics/shortlink/${link.id}`}>
+                                                            <span>Detail</span>
+                                                            <ArrowUpRight className="w-3 h-3" />
+                                                        </Link>
+                                                    </Button>
+                                                </td>
+                                            </tr>
+                                        ))}
+                                    </tbody>
+                                </table>
+                            </div>
+
+                            {/* Mobile Card List */}
+                            <div className="md:hidden divide-y divide-slate-100 dark:divide-slate-800">
+                                {topShortlinks.map((link) => (
+                                    <div key={link.id} className="py-3 space-y-1.5">
+                                        <div className="flex items-start justify-between gap-3">
+                                            <div className="min-w-0">
+                                                <div className="font-semibold text-sm text-slate-800 dark:text-slate-200 truncate">
                                                     {link.title || link.slug}
                                                 </div>
                                                 <div className="font-mono text-primary text-[11px]">
-                                                    link.kanal3516.site/{link.slug}
+                                                    /{link.slug}
                                                 </div>
-                                            </td>
-                                            <td className="py-3 pr-4 max-w-[240px] truncate text-slate-500">
-                                                {link.destination_url}
-                                            </td>
-                                            <td className="py-3 text-right font-bold text-slate-900 dark:text-slate-100 pr-4">
-                                                {link.click_count.toLocaleString()}
-                                            </td>
-                                            <td className="py-3 text-right">
-                                                <Button asChild variant="ghost" size="sm" className="h-7 text-xs gap-1">
+                                            </div>
+                                            <div className="flex items-center gap-2 shrink-0">
+                                                <span className="font-bold text-sm text-slate-900 dark:text-slate-100">
+                                                    {link.click_count.toLocaleString()}
+                                                </span>
+                                                <Button asChild variant="ghost" size="sm" className="h-7 w-7 p-0">
                                                     <Link href={`/analytics/shortlink/${link.id}`}>
-                                                        <span>Detail</span>
-                                                        <ArrowUpRight className="w-3 h-3" />
+                                                        <ArrowUpRight className="w-3.5 h-3.5" />
                                                     </Link>
                                                 </Button>
-                                            </td>
-                                        </tr>
-                                    ))}
-                                </tbody>
-                            </table>
-                        </div>
+                                            </div>
+                                        </div>
+                                        <div className="text-xs text-slate-500 truncate">
+                                            {link.destination_url}
+                                        </div>
+                                    </div>
+                                ))}
+                            </div>
+                        </>
                     )}
                 </div>
             </div>

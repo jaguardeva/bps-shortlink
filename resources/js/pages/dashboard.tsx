@@ -74,10 +74,11 @@ export default function Dashboard({
             breadcrumbs={[{ label: "Dashboard" }]}
             actions={
                 <div className="flex items-center gap-2">
-                    <Button asChild size="sm" className="gap-2 shadow-xs">
+                    <Button asChild size="sm" className="gap-1.5 shadow-xs h-8 sm:h-9">
                         <Link href="/shortlinks/create">
                             <PlusCircle className="w-4 h-4" />
-                            <span>Buat Tautan Baru</span>
+                            <span className="hidden sm:inline">Buat Tautan Baru</span>
+                            <span className="sm:hidden">Buat Tautan</span>
                         </Link>
                     </Button>
                 </div>
@@ -85,7 +86,7 @@ export default function Dashboard({
         >
             <div className="space-y-6">
                 {/* Welcome Banner */}
-                <div className="rounded-2xl p-6 bg-linear-to-r from-sky-600 via-blue-600 to-indigo-700 text-white shadow-md relative overflow-hidden">
+                <div className="rounded-2xl p-4 sm:p-6 bg-linear-to-r from-sky-600 via-blue-600 to-indigo-700 text-white shadow-md relative overflow-hidden">
                     <div className="absolute right-0 top-0 -mt-6 -mr-6 w-56 h-56 rounded-full bg-white/10 blur-2xl pointer-events-none" />
                     <div className="relative z-10 flex flex-col md:flex-row md:items-center md:justify-between gap-4">
                         <div>
@@ -211,13 +212,13 @@ export default function Dashboard({
                         </div>
                     ) : (
                         <div className="pt-4">
-                            <div className="h-44 w-full flex items-end gap-2 overflow-x-auto pb-4">
+                            <div className="h-44 w-full flex items-end gap-1 sm:gap-2 overflow-x-auto pb-4">
                                 {clicksOverTime.map((item, idx) => {
                                     const heightPercent = Math.max((item.total / maxClicks) * 100, 6);
                                     return (
                                         <div
                                             key={idx}
-                                            className="flex-1 min-w-[24px] max-w-[42px] flex flex-col items-center gap-2 group relative"
+                                            className="flex-1 min-w-[16px] sm:min-w-[24px] max-w-[42px] flex flex-col items-center gap-2 group relative"
                                         >
                                             <div className="opacity-0 group-hover:opacity-100 absolute -top-8 transition-opacity bg-slate-900 text-white dark:bg-white dark:text-slate-900 text-[10px] py-0.5 px-1.5 rounded pointer-events-none whitespace-nowrap z-10 shadow-md">
                                                 {item.date}: {item.total} klik
@@ -233,7 +234,7 @@ export default function Dashboard({
                                                     }}
                                                 />
                                             </div>
-                                            <span className="text-[9px] text-slate-400 font-mono transform -rotate-45 origin-top-left truncate w-6 block">
+                                            <span className="text-[8px] sm:text-[9px] text-slate-400 font-mono transform -rotate-45 origin-top-left truncate w-5 sm:w-6 block">
                                                 {item.date.slice(5)}
                                             </span>
                                         </div>

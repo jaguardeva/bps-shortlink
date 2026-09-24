@@ -30,8 +30,7 @@ export default function EditUser({ targetUser, roles }: EditUserProps) {
         <AppLayout
             title={`Edit Pengguna: ${targetUser.name}`}
             breadcrumbs={[
-                { label: "Dashboard", href: "/dashboard" },
-                { label: "Pengguna", href: "/admin/users" },
+                { label: "Kelola Pengguna", href: "/admin/users" },
                 { label: targetUser.name, href: `/admin/users/${targetUser.id}` },
                 { label: "Edit" },
             ]}

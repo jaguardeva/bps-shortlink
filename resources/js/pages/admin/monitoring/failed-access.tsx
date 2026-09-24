@@ -25,11 +25,7 @@ export default function MonitoringFailedAccess({ failedAttempts }: MonitoringFai
     return (
         <AppLayout
             title="Percobaan Akses Gagal"
-            breadcrumbs={[
-                { label: "Dashboard", href: "/dashboard" },
-                { label: "Pemantauan" },
-                { label: "Akses Gagal" },
-            ]}
+            breadcrumbs={[{ label: "Percobaan Akses Gagal" }]}
         >
             <div className="space-y-6">
                 <div>

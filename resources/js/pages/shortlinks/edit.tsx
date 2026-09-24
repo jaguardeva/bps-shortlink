@@ -67,7 +67,7 @@ export default function EditShortlink({
         <AppLayout
             title={`Edit Shortlink /${shortlink.slug}`}
             breadcrumbs={[
-                { label: "Shortlinks", href: "/shortlinks" },
+                { label: "Kelola Tautan", href: "/shortlinks" },
                 { label: `/${shortlink.slug}`, href: `/shortlinks/${shortlink.id}` },
                 { label: "Edit" },
             ]}

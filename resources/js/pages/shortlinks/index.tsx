@@ -2,6 +2,7 @@ import React, { useState } from "react";
 import { Link, router } from "@inertiajs/react";
 import AppLayout from "@/components/layouts/AppLayout";
 import { Button, buttonVariants } from "@/components/ui/button";
+import { copyToClipboard } from "@/lib/utils";
 import { Input } from "@/components/ui/input";
 import {
     Plus,
@@ -72,9 +73,9 @@ export default function ShortlinksIndex({
         );
     };
 
-    const copyToClipboard = (slug: string) => {
+    const handleCopy = async (slug: string) => {
         const fullUrl = `${window.location.origin}/${slug}`;
-        navigator.clipboard.writeText(fullUrl);
+        await copyToClipboard(fullUrl);
         setCopiedSlug(slug);
         setTimeout(() => setCopiedSlug(null), 2000);
     };
@@ -92,20 +93,21 @@ export default function ShortlinksIndex({
     return (
         <AppLayout
             title="Kelola Shortlink"
-            breadcrumbs={[{ label: "Shortlinks" }]}
+            breadcrumbs={[{ label: "Kelola Tautan" }]}
             actions={
                 <Link
                     href="/shortlinks/create"
-                    className={buttonVariants({ className: "gap-2" })}
+                    className={buttonVariants({ className: "gap-1.5 h-8 sm:h-9" })}
                 >
                     <Plus className="size-4" />
-                    <span>Buat Shortlink</span>
+                    <span className="hidden sm:inline">Buat Shortlink</span>
+                    <span className="sm:hidden">Buat</span>
                 </Link>
             }
         >
             <div className="space-y-6 max-w-7xl mx-auto">
                 {/* Search & Filter Header */}
-                <div className="flex flex-col md:flex-row gap-3 items-stretch md:items-center justify-between bg-card p-4 rounded-xl border border-border/50 shadow-sm">
+                <div className="flex flex-col gap-3 items-stretch justify-between bg-card p-4 rounded-xl border border-border/50 shadow-sm">
                     <form onSubmit={handleSearch} className="flex-1 flex gap-2">
                         <div className="relative flex-1">
                             <Search className="absolute left-3 top-1/2 -translate-y-1/2 size-4 text-muted-foreground pointer-events-none" />
@@ -121,13 +123,13 @@ export default function ShortlinksIndex({
                         </Button>
                     </form>
 
-                    <div className="flex flex-wrap items-center gap-2">
+                    <div className="grid grid-cols-2 md:flex md:flex-wrap items-center gap-2">
                         <select
                             value={statusFilter}
                             onChange={(e) =>
                                 handleFilterChange(e.target.value, tagFilter)
                             }
-                            className="h-9 rounded-md border border-input bg-input/20 px-3 text-xs font-medium text-foreground outline-none focus:ring-2 focus:ring-ring"
+                            className="h-9 rounded-md border border-input bg-input/20 px-3 text-xs font-medium text-foreground outline-none focus:ring-2 focus:ring-ring w-full md:w-auto"
                         >
                             <option value="">Semua Status</option>
                             <option value="active">Aktif</option>
@@ -140,7 +142,7 @@ export default function ShortlinksIndex({
                             onChange={(e) =>
                                 handleFilterChange(statusFilter, e.target.value)
                             }
-                            className="h-9 rounded-md border border-input bg-input/20 px-3 text-xs font-medium text-foreground outline-none focus:ring-2 focus:ring-ring"
+                            className="h-9 rounded-md border border-input bg-input/20 px-3 text-xs font-medium text-foreground outline-none focus:ring-2 focus:ring-ring w-full md:w-auto"
                         >
                             <option value="">Semua Tag</option>
                             {tags.map((t) => (
@@ -154,7 +156,8 @@ export default function ShortlinksIndex({
 
                 {/* Table Content */}
                 <div className="bg-card rounded-xl border border-border/50 shadow-sm overflow-hidden">
-                    <div className="overflow-x-auto">
+                    {/* Desktop Table */}
+                    <div className="hidden md:block overflow-x-auto">
                         <table className="w-full text-left text-sm">
                             <thead className="bg-muted/40 border-b border-border text-xs font-semibold text-muted-foreground uppercase tracking-wider">
                                 <tr>
@@ -207,8 +210,9 @@ export default function ShortlinksIndex({
                                                             /{item.slug}
                                                         </span>
                                                         <button
+                                                            type="button"
                                                             onClick={() =>
-                                                                copyToClipboard(item.slug)
+                                                                handleCopy(item.slug)
                                                             }
                                                             title="Salin tautan"
                                                             className="text-muted-foreground hover:text-foreground transition-colors p-1 rounded hover:bg-muted"
@@ -384,14 +388,155 @@ export default function ShortlinksIndex({
                         </table>
                     </div>
 
+                    {/* Mobile Cards */}
+                    <div className="md:hidden divide-y divide-border/60">
+                        {shortlinks.data.length === 0 ? (
+                            <div className="text-center py-12 text-muted-foreground">
+                                <div className="flex flex-col items-center justify-center gap-2">
+                                    <Link2 className="size-8 text-muted-foreground/50" />
+                                    <p className="font-medium">
+                                        Belum ada shortlink yang ditemukan.
+                                    </p>
+                                    <Link
+                                        href="/shortlinks/create"
+                                        className={buttonVariants({
+                                            variant: "outline",
+                                            size: "sm",
+                                            className: "mt-2",
+                                        })}
+                                    >
+                                        Buat Shortlink Pertama
+                                    </Link>
+                                </div>
+                            </div>
+                        ) : (
+                            shortlinks.data.map((item) => (
+                                <div key={item.id} className="p-4 space-y-3">
+                                    {/* Slug + Copy + Status */}
+                                    <div className="flex items-start justify-between gap-2">
+                                        <div className="min-w-0 space-y-1">
+                                            <div className="flex items-center gap-2 flex-wrap">
+                                                <span className="font-semibold text-sm text-foreground tracking-tight">
+                                                    /{item.slug}
+                                                </span>
+                                                <button
+                                                    type="button"
+                                                    onClick={() => handleCopy(item.slug)}
+                                                    className="text-muted-foreground hover:text-foreground transition-colors p-1 rounded hover:bg-muted"
+                                                >
+                                                    {copiedSlug === item.slug ? (
+                                                        <Check className="size-3.5 text-emerald-500" />
+                                                    ) : (
+                                                        <Copy className="size-3.5" />
+                                                    )}
+                                                </button>
+                                                {item.has_password && (
+                                                    <span className="inline-flex items-center p-0.5 rounded bg-amber-500/10 text-amber-600 dark:text-amber-400">
+                                                        <Lock className="size-3" />
+                                                    </span>
+                                                )}
+                                            </div>
+                                            {item.title && (
+                                                <p className="text-xs text-muted-foreground truncate">
+                                                    {item.title}
+                                                </p>
+                                            )}
+                                        </div>
+                                        <div className="shrink-0">
+                                            {item.is_expired ? (
+                                                <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[10px] font-medium bg-amber-500/10 text-amber-600 dark:text-amber-400">
+                                                    Kedaluwarsa
+                                                </span>
+                                            ) : item.status === "active" ? (
+                                                <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[10px] font-medium bg-emerald-500/10 text-emerald-600 dark:text-emerald-400">
+                                                    Aktif
+                                                </span>
+                                            ) : (
+                                                <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[10px] font-medium bg-zinc-500/10 text-zinc-600 dark:text-zinc-400">
+                                                    Nonaktif
+                                                </span>
+                                            )}
+                                        </div>
+                                    </div>
+
+                                    {/* Destination URL */}
+                                    <div className="flex items-center gap-1.5 text-xs text-muted-foreground">
+                                        <ExternalLink className="size-3 shrink-0" />
+                                        <span className="truncate" title={item.destination_url}>
+                                            {item.destination_url}
+                                        </span>
+                                    </div>
+
+                                    {/* Tags */}
+                                    {item.tags && item.tags.length > 0 && (
+                                        <div className="flex flex-wrap gap-1">
+                                            {item.tags.map((tag) => (
+                                                <span
+                                                    key={tag.id}
+                                                    className="inline-flex items-center gap-0.5 px-1.5 py-0.5 rounded-md bg-muted text-[10px] text-muted-foreground font-medium"
+                                                >
+                                                    <TagIcon className="size-2.5" />
+                                                    {tag.name}
+                                                </span>
+                                            ))}
+                                        </div>
+                                    )}
+
+                                    {/* Meta row + Actions */}
+                                    <div className="flex items-center justify-between pt-1">
+                                        <div className="flex items-center gap-3 text-[11px] text-muted-foreground">
+                                            <span className="font-semibold text-primary">
+                                                {item.click_count.toLocaleString("id-ID")} klik
+                                            </span>
+                                            {isAdmin && item.user?.name && (
+                                                <span className="flex items-center gap-1">
+                                                    <User className="size-3" />
+                                                    {item.user.name}
+                                                </span>
+                                            )}
+                                            <span className="flex items-center gap-1">
+                                                <Clock className="size-3" />
+                                                {item.expires_at
+                                                    ? new Date(item.expires_at).toLocaleDateString("id-ID", { day: "numeric", month: "short" })
+                                                    : "∞"}
+                                            </span>
+                                        </div>
+                                        <div className="flex items-center gap-0.5">
+                                            <Link
+                                                href={`/shortlinks/${item.id}`}
+                                                className={buttonVariants({ variant: "ghost", size: "icon-xs" })}
+                                            >
+                                                <QrCode className="size-3.5" />
+                                            </Link>
+                                            <Link
+                                                href={`/shortlinks/${item.id}/edit`}
+                                                className={buttonVariants({ variant: "ghost", size: "icon-xs" })}
+                                            >
+                                                <Edit className="size-3.5" />
+                                            </Link>
+                                            <Button
+                                                variant="ghost"
+                                                size="icon-xs"
+                                                onClick={() => deleteShortlink(item.id, item.slug)}
+                                                className="text-muted-foreground hover:text-destructive"
+                                            >
+                                                <Trash2 className="size-3.5" />
+                                            </Button>
+                                        </div>
+                                    </div>
+                                </div>
+                            ))
+                        )}
+                    </div>
+
                     {/* Pagination */}
                     {shortlinks.links && shortlinks.links.length > 3 && (
-                        <div className="flex items-center justify-between px-4 py-3 border-t border-border bg-muted/20">
+                        <div className="flex flex-col sm:flex-row items-center sm:justify-between gap-2 px-4 py-3 border-t border-border bg-muted/20">
                             <span className="text-xs text-muted-foreground">
                                 Menampilkan {shortlinks.from || 0} -{" "}
                                 {shortlinks.to || 0} dari {shortlinks.total} data
                             </span>
-                            <div className="flex gap-1">
+                            <div className="flex gap-1 overflow-x-auto max-w-full pb-1">
                                 {shortlinks.links.map((link, idx) =>
                                     link.url ? (
                                         <Link
@@ -400,6 +545,7 @@ export default function ShortlinksIndex({
                                             className={buttonVariants({
                                                 variant: link.active ? "default" : "outline",
                                                 size: "xs",
+                                                className: "shrink-0",
                                             })}
                                             dangerouslySetInnerHTML={{
                                                 __html: link.label,
@@ -411,7 +557,7 @@ export default function ShortlinksIndex({
                                             className={buttonVariants({
                                                 variant: "outline",
                                                 size: "xs",
-                                                className: "opacity-50 pointer-events-none",
+                                                className: "opacity-50 pointer-events-none shrink-0",
                                             })}
                                             dangerouslySetInnerHTML={{
                                                 __html: link.label,

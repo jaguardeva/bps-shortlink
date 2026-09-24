@@ -153,15 +153,13 @@ export default function UserIndex({ users, roles, filters }: UserIndexProps) {
     return (
         <AppLayout
             title="Kelola Pengguna"
-            breadcrumbs={[
-                { label: "Dashboard", href: "/dashboard" },
-                { label: "Pengguna" },
-            ]}
+            breadcrumbs={[{ label: "Kelola Pengguna" }]}
             actions={
-                <Button asChild size="sm" className="gap-2">
+                <Button asChild size="sm" className="gap-1.5 h-8 sm:h-9">
                     <Link href="/admin/users/create">
                         <UserPlus className="w-4 h-4" />
-                        <span>Tambah Pengguna</span>
+                        <span className="hidden sm:inline">Tambah Pengguna</span>
+                        <span className="sm:hidden">Tambah</span>
                     </Link>
                 </Button>
             }
@@ -180,7 +178,7 @@ export default function UserIndex({ users, roles, filters }: UserIndexProps) {
                 </div>
 
                 {/* Filters */}
-                <div className="bg-white dark:bg-slate-900 p-4 rounded-2xl border border-slate-200/80 dark:border-slate-800 shadow-xs flex flex-col md:flex-row items-center gap-3">
+                <div className="bg-white dark:bg-slate-900 p-4 rounded-2xl border border-slate-200/80 dark:border-slate-800 shadow-xs flex flex-col md:flex-row items-stretch md:items-center gap-3">
                     <form onSubmit={handleSearchSubmit} className="relative flex-1 w-full">
                         <Search className="w-4 h-4 text-slate-400 absolute left-3.5 top-1/2 -translate-y-1/2" />
                         <Input
@@ -191,14 +189,14 @@ export default function UserIndex({ users, roles, filters }: UserIndexProps) {
                         />
                     </form>
 
-                    <div className="flex items-center gap-2 w-full md:w-auto">
+                    <div className="grid grid-cols-2 md:flex md:items-center gap-2 w-full md:w-auto">
                         <select
                             value={role}
                             onChange={(e) => {
                                 setRole(e.target.value);
                                 applyFilters(search, e.target.value, status);
                             }}
-                            className="h-9 px-3 text-xs bg-slate-50 dark:bg-slate-800/50 border border-slate-200 dark:border-slate-800 rounded-xl focus:outline-hidden focus:ring-2 focus:ring-primary/20 text-slate-700 dark:text-slate-300"
+                            className="h-9 px-3 text-xs bg-slate-50 dark:bg-slate-800/50 border border-slate-200 dark:border-slate-800 rounded-xl focus:outline-hidden focus:ring-2 focus:ring-primary/20 text-slate-700 dark:text-slate-300 w-full"
                         >
                             <option value="">Semua Peran</option>
                             {roles.map((r) => (
@@ -214,7 +212,7 @@ export default function UserIndex({ users, roles, filters }: UserIndexProps) {
                                 setStatus(e.target.value);
                                 applyFilters(search, role, e.target.value);
                             }}
-                            className="h-9 px-3 text-xs bg-slate-50 dark:bg-slate-800/50 border border-slate-200 dark:border-slate-800 rounded-xl focus:outline-hidden focus:ring-2 focus:ring-primary/20 text-slate-700 dark:text-slate-300"
+                            className="h-9 px-3 text-xs bg-slate-50 dark:bg-slate-800/50 border border-slate-200 dark:border-slate-800 rounded-xl focus:outline-hidden focus:ring-2 focus:ring-primary/20 text-slate-700 dark:text-slate-300 w-full"
                         >
                             <option value="">Semua Status</option>
                             <option value="active">Aktif</option>
@@ -224,9 +222,9 @@ export default function UserIndex({ users, roles, filters }: UserIndexProps) {
                     </div>
                 </div>
 
-                {/* Users Table */}
+                {/* Users Table — Desktop */}
                 <div className="bg-white dark:bg-slate-900 rounded-2xl border border-slate-200/80 dark:border-slate-800 shadow-xs overflow-hidden">
-                    <div className="overflow-x-auto">
+                    <div className="hidden md:block overflow-x-auto">
                         <table className="w-full text-left text-xs">
                             <thead className="bg-slate-50/75 dark:bg-slate-800/40 border-b border-slate-100 dark:border-slate-800 text-slate-400 font-semibold uppercase">
                                 <tr>
@@ -351,13 +349,121 @@ export default function UserIndex({ users, roles, filters }: UserIndexProps) {
                         </table>
                     </div>
 
+                    {/* Users Cards — Mobile */}
+                    <div className="md:hidden divide-y divide-slate-100 dark:divide-slate-800">
+                        {users.data.length === 0 ? (
+                            <div className="py-12 text-center text-slate-400 text-sm">
+                                Tidak ditemukan pengguna yang sesuai.
+                            </div>
+                        ) : (
+                            users.data.map((user) => (
+                                <div key={user.id} className="p-4 space-y-3">
+                                    <div className="flex items-start justify-between gap-3">
+                                        <div className="min-w-0">
+                                            <div className="font-semibold text-sm text-slate-900 dark:text-slate-100 truncate">
+                                                {user.name}
+                                            </div>
+                                            <div className="text-slate-400 text-xs truncate">{user.email}</div>
+                                        </div>
+                                        <DropdownMenu>
+                                            <DropdownMenuTrigger
+                                                render={(props) => (
+                                                    <Button variant="ghost" size="icon" className="h-8 w-8 shrink-0" {...props}>
+                                                        <MoreHorizontal className="w-4 h-4" />
+                                                    </Button>
+                                                )}
+                                            />
+                                            <DropdownMenuContent align="end">
+                                                <DropdownMenuGroup>
+                                                    <DropdownMenuLabel>Aksi</DropdownMenuLabel>
+                                                    <DropdownMenuItem
+                                                        className="gap-2 cursor-pointer"
+                                                        onClick={() => router.visit(`/admin/users/${user.id}`)}
+                                                    >
+                                                        <Eye className="w-4 h-4" />
+                                                        <span>Lihat Profil</span>
+                                                    </DropdownMenuItem>
+                                                    <DropdownMenuItem
+                                                        className="gap-2 cursor-pointer"
+                                                        onClick={() => router.visit(`/admin/users/${user.id}/edit`)}
+                                                    >
+                                                        <Edit className="w-4 h-4" />
+                                                        <span>Edit Data</span>
+                                                    </DropdownMenuItem>
+                                                    <DropdownMenuItem
+                                                        className="gap-2 cursor-pointer"
+                                                        onClick={() => router.visit(`/admin/analytics/users/${user.id}`)}
+                                                    >
+                                                        <BarChart3 className="w-4 h-4" />
+                                                        <span>Lihat Statistik</span>
+                                                    </DropdownMenuItem>
+                                                    <DropdownMenuItem
+                                                        onClick={() => handleOpenResetDialog(user)}
+                                                        className="gap-2 cursor-pointer"
+                                                    >
+                                                        <KeyRound className="w-4 h-4" />
+                                                        <span>Reset Kata Sandi</span>
+                                                    </DropdownMenuItem>
+                                                </DropdownMenuGroup>
+                                                <DropdownMenuSeparator />
+                                                <DropdownMenuGroup>
+                                                    <DropdownMenuItem
+                                                        onClick={() => handleToggle(user)}
+                                                        className="gap-2 cursor-pointer"
+                                                    >
+                                                        <Power className="w-4 h-4" />
+                                                        <span>{user.status === "active" ? "Nonaktifkan Akun" : "Aktifkan Akun"}</span>
+                                                    </DropdownMenuItem>
+                                                    <DropdownMenuItem
+                                                        onClick={() => handleDelete(user)}
+                                                        className="gap-2 text-rose-600 focus:text-rose-600 cursor-pointer"
+                                                    >
+                                                        <Trash2 className="w-4 h-4" />
+                                                        <span>Hapus Pengguna</span>
+                                                    </DropdownMenuItem>
+                                                </DropdownMenuGroup>
+                                            </DropdownMenuContent>
+                                        </DropdownMenu>
+                                    </div>
+                                    <div className="flex flex-wrap items-center gap-2">
+                                        {user.roles?.map((r) => (
+                                            <span
+                                                key={r.id}
+                                                className={`inline-flex items-center gap-1 px-2 py-0.5 rounded-md font-mono text-[10px] font-semibold uppercase ${
+                                                    r.name === "admin"
+                                                        ? "bg-purple-50 text-purple-600 dark:bg-purple-950/50 dark:text-purple-400 border border-purple-200 dark:border-purple-800"
+                                                        : "bg-blue-50 text-blue-600 dark:bg-blue-950/50 dark:text-blue-400 border border-blue-200 dark:border-blue-800"
+                                                }`}
+                                            >
+                                                <Shield className="w-2.5 h-2.5" />
+                                                {r.name}
+                                            </span>
+                                        ))}
+                                        {renderStatusBadge(user.status)}
+                                    </div>
+                                    <div className="flex items-center justify-between text-[11px] text-slate-500">
+                                        <span>{user.shortlinks_count || 0} tautan</span>
+                                        <span>
+                                            {user.last_login_at
+                                                ? new Date(user.last_login_at).toLocaleString("id-ID", {
+                                                      dateStyle: "short",
+                                                      timeStyle: "short",
+                                                  })
+                                                : "Belum login"}
+                                        </span>
+                                    </div>
+                                </div>
+                            ))
+                        )}
+                    </div>
+
                     {/* Pagination */}
                     {users.links && users.links.length > 3 && (
-                        <div className="flex items-center justify-between px-4 py-3 border-t border-slate-100 dark:border-slate-800 text-xs">
+                        <div className="flex flex-col sm:flex-row items-center sm:justify-between gap-2 px-4 py-3 border-t border-slate-100 dark:border-slate-800 text-xs">
                             <span className="text-slate-500">
                                 Menampilkan {users.from || 0} - {users.to || 0} dari {users.total} pengguna
                             </span>
-                            <div className="flex gap-1">
+                            <div className="flex gap-1 overflow-x-auto max-w-full pb-1">
                                 {users.links.map((link, idx) => (
                                     <Button
                                         key={idx}
@@ -365,7 +471,7 @@ export default function UserIndex({ users, roles, filters }: UserIndexProps) {
                                         disabled={!link.url}
                                         variant={link.active ? "default" : "outline"}
                                         size="sm"
-                                        className="h-8 px-3 text-xs"
+                                        className="h-8 px-3 text-xs shrink-0"
                                     >
                                         {link.url ? (
                                             <Link

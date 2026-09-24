@@ -29,8 +29,7 @@ export default function CreateUser({ roles }: CreateUserProps) {
         <AppLayout
             title="Tambah Pengguna Baru"
             breadcrumbs={[
-                { label: "Dashboard", href: "/dashboard" },
-                { label: "Pengguna", href: "/admin/users" },
+                { label: "Kelola Pengguna", href: "/admin/users" },
                 { label: "Tambah Pengguna" },
             ]}
         >

@@ -53,7 +53,7 @@ export default function CreateShortlink({ tags, appUrl }: CreateShortlinkProps) 
         <AppLayout
             title="Buat Shortlink Baru"
             breadcrumbs={[
-                { label: "Shortlinks", href: "/shortlinks" },
+                { label: "Kelola Tautan", href: "/shortlinks" },
                 { label: "Buat Baru" },
             ]}
         >

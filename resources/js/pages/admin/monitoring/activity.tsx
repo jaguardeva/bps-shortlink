@@ -26,11 +26,7 @@ export default function MonitoringActivity({ activities }: MonitoringActivityPro
     return (
         <AppLayout
             title="Pemantauan Aktivitas Sistem"
-            breadcrumbs={[
-                { label: "Dashboard", href: "/dashboard" },
-                { label: "Pemantauan" },
-                { label: "Aktivitas Sistem" },
-            ]}
+            breadcrumbs={[{ label: "Aktivitas Sistem" }]}
         >
             <div className="space-y-6">
                 <div>

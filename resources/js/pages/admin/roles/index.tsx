@@ -61,9 +61,8 @@ export default function RolesIndex({ roles, permissions }: RolesIndexProps) {
         <AppLayout
             title="Kelola Peran & Izin"
             breadcrumbs={[
-                { label: "Dashboard", href: "/dashboard" },
-                { label: "Pengguna", href: "/admin/users" },
-                { label: "Peran & Izin" },
+                { label: "Kelola Pengguna", href: "/admin/users" },
+                { label: "Peran & Hak Akses" },
             ]}
         >
             <div className="space-y-6">

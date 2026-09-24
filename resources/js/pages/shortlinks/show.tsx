@@ -2,6 +2,7 @@ import React, { useState } from "react";
 import { Link, router } from "@inertiajs/react";
 import AppLayout from "@/components/layouts/AppLayout";
 import { Button } from "@/components/ui/button";
+import { copyToClipboard } from "@/lib/utils";
 import {
     Copy,
     Check,
@@ -47,10 +48,11 @@ export default function ShowShortlink({
     appUrl,
 }: ShowShortlinkProps) {
     const [copied, setCopied] = useState(false);
-    const fullUrl = `${appUrl}/${shortlink.slug}`;
+    const baseUrl = (typeof window !== "undefined" && window.location.origin ? window.location.origin : (appUrl || "")).replace(/\/+$/, "");
+    const fullUrl = `${baseUrl}/${shortlink.slug}`;
 
-    const copyUrl = () => {
-        navigator.clipboard.writeText(fullUrl);
+    const copyUrl = async () => {
+        await copyToClipboard(fullUrl);
         setCopied(true);
         setTimeout(() => setCopied(false), 2000);
     };
@@ -73,21 +75,21 @@ export default function ShowShortlink({
         <AppLayout
             title={`Detail /${shortlink.slug}`}
             breadcrumbs={[
-                { label: "Shortlinks", href: "/shortlinks" },
+                { label: "Kelola Tautan", href: "/shortlinks" },
                 { label: `/${shortlink.slug}` },
             ]}
             actions={
                 <div className="flex items-center gap-2">
-                    <Button asChild variant="outline" size="sm">
+                    <Button asChild variant="outline" size="sm" className="h-8 sm:h-9">
                         <Link href={`/analytics/shortlink/${shortlink.id}`}>
-                            <BarChart3 className="size-4 mr-1.5" />
-                            <span>Analitik Lengkap</span>
+                            <BarChart3 className="size-4 sm:mr-1.5" />
+                            <span className="hidden sm:inline">Analitik Lengkap</span>
                         </Link>
                     </Button>
-                    <Button asChild size="sm">
+                    <Button asChild size="sm" className="h-8 sm:h-9">
                         <Link href={`/shortlinks/${shortlink.id}/edit`}>
-                            <Edit className="size-4 mr-1.5" />
-                            <span>Edit Tautan</span>
+                            <Edit className="size-4 sm:mr-1.5" />
+                            <span className="hidden sm:inline">Edit Tautan</span>
                         </Link>
                     </Button>
                 </div>
@@ -95,8 +97,8 @@ export default function ShowShortlink({
         >
             <div className="max-w-6xl mx-auto space-y-6">
                 {/* Top Banner Card */}
-                <div className="bg-card rounded-2xl border border-border/60 shadow-sm p-6 sm:p-8">
-                    <div className="flex flex-col md:flex-row md:items-center justify-between gap-6">
+                <div className="bg-card rounded-2xl border border-border/60 shadow-sm p-4 sm:p-6 lg:p-8">
+                    <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 sm:gap-6">
                         <div className="space-y-2">
                             <div className="flex flex-wrap items-center gap-2">
                                 <span className="text-2xl font-bold tracking-tight text-foreground font-mono">
@@ -104,6 +106,7 @@ export default function ShowShortlink({
                                 </span>
 
                                 <button
+                                    type="button"
                                     onClick={copyUrl}
                                     className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-lg bg-muted text-xs font-medium hover:bg-muted/80 text-foreground transition-colors"
                                 >
@@ -159,7 +162,7 @@ export default function ShowShortlink({
                         </div>
 
                         {/* Status Badges & Quick Stats */}
-                        <div className="flex flex-wrap md:flex-col items-end gap-2.5 shrink-0">
+                        <div className="flex flex-wrap md:flex-col items-start md:items-end justify-between md:justify-start gap-2.5 shrink-0 pt-3 md:pt-0 border-t md:border-t-0 border-border/50">
                             <div className="flex items-center gap-2">
                                 {shortlink.is_expired ? (
                                     <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-semibold bg-amber-500/10 text-amber-600 dark:text-amber-400 border border-amber-500/20">
@@ -186,7 +189,7 @@ export default function ShowShortlink({
                                 )}
                             </div>
 
-                            <div className="text-right">
+                            <div className="text-left md:text-right">
                                 <span className="text-2xl font-black text-foreground tracking-tight">
                                     {shortlink.click_count.toLocaleString("id-ID")}
                                 </span>
@@ -277,7 +280,7 @@ export default function ShowShortlink({
                                 </div>
                             </div>
 
-                            <div className="pt-4 border-t border-border/60 flex items-center gap-2">
+                            <div className="pt-4 border-t border-border/60 flex flex-wrap items-center gap-2">
                                 <Button
                                     variant="outline"
                                     size="sm"
@@ -321,36 +324,66 @@ export default function ShowShortlink({
                                     Belum ada data kunjungan yang tercatat untuk shortlink ini.
                                 </p>
                             ) : (
-                                <div className="overflow-x-auto">
-                                    <table className="w-full text-left text-xs">
-                                        <thead className="bg-muted/40 text-muted-foreground font-semibold">
-                                            <tr>
-                                                <th className="py-2 px-3 rounded-l">Waktu</th>
-                                                <th className="py-2 px-3">Perangkat</th>
-                                                <th className="py-2 px-3">Browser</th>
-                                                <th className="py-2 px-3">OS</th>
-                                                <th className="py-2 px-3 rounded-r">IP</th>
-                                            </tr>
-                                        </thead>
-                                        <tbody className="divide-y divide-border/60">
-                                            {recentClicks.map((click) => (
-                                                <tr key={click.id}>
-                                                    <td className="py-2 px-3 font-mono">
+                                <div className="space-y-3">
+                                    {/* Mobile Cards View */}
+                                    <div className="sm:hidden space-y-2">
+                                        {recentClicks.map((click) => (
+                                            <div
+                                                key={click.id}
+                                                className="p-3 rounded-xl bg-muted/40 border border-border/60 text-xs space-y-1.5"
+                                            >
+                                                <div className="flex items-center justify-between text-muted-foreground font-mono text-[11px]">
+                                                    <span>
                                                         {new Date(click.clicked_at).toLocaleString("id-ID", {
                                                             dateStyle: "short",
                                                             timeStyle: "short",
                                                         })}
-                                                    </td>
-                                                    <td className="py-2 px-3">{click.device_type || "-"}</td>
-                                                    <td className="py-2 px-3">{click.browser || "-"}</td>
-                                                    <td className="py-2 px-3">{click.operating_system || "-"}</td>
-                                                    <td className="py-2 px-3 font-mono text-muted-foreground">
-                                                        {click.ip_address || "-"}
-                                                    </td>
+                                                    </span>
+                                                    <span className="font-semibold">{click.ip_address || "-"}</span>
+                                                </div>
+                                                <div className="flex items-center gap-2 text-foreground font-medium flex-wrap">
+                                                    <span>{click.device_type || "Unknown"}</span>
+                                                    <span className="text-muted-foreground">•</span>
+                                                    <span>{click.browser || "Unknown"}</span>
+                                                    <span className="text-muted-foreground">•</span>
+                                                    <span className="text-muted-foreground">{click.operating_system || "Unknown"}</span>
+                                                </div>
+                                            </div>
+                                        ))}
+                                    </div>
+
+                                    {/* Desktop Table View */}
+                                    <div className="hidden sm:block overflow-x-auto">
+                                        <table className="w-full text-left text-xs">
+                                            <thead className="bg-muted/40 text-muted-foreground font-semibold">
+                                                <tr>
+                                                    <th className="py-2 px-3 rounded-l">Waktu</th>
+                                                    <th className="py-2 px-3">Perangkat</th>
+                                                    <th className="py-2 px-3">Browser</th>
+                                                    <th className="py-2 px-3">OS</th>
+                                                    <th className="py-2 px-3 rounded-r">IP</th>
                                                 </tr>
-                                            ))}
-                                        </tbody>
-                                    </table>
+                                            </thead>
+                                            <tbody className="divide-y divide-border/60">
+                                                {recentClicks.map((click) => (
+                                                    <tr key={click.id}>
+                                                        <td className="py-2 px-3 font-mono">
+                                                            {new Date(click.clicked_at).toLocaleString("id-ID", {
+                                                                dateStyle: "short",
+                                                                timeStyle: "short",
+                                                            })}
+                                                        </td>
+                                                        <td className="py-2 px-3">{click.device_type || "-"}</td>
+                                                        <td className="py-2 px-3">{click.browser || "-"}</td>
+                                                        <td className="py-2 px-3">{click.operating_system || "-"}</td>
+                                                        <td className="py-2 px-3 font-mono text-muted-foreground">
+                                                            {click.ip_address || "-"}
+                                                        </td>
+                                                    </tr>
+                                                ))}
+                                            </tbody>
+                                        </table>
+                                    </div>
                                 </div>
                             )}
                         </div>

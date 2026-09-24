@@ -47,10 +47,7 @@ export default function ProfileIndex({ user }: ProfileProps) {
     return (
         <AppLayout
             title="Profil Pengguna"
-            breadcrumbs={[
-                { label: "Dashboard", href: "/dashboard" },
-                { label: "Profil Akun" },
-            ]}
+            breadcrumbs={[{ label: "Profil Akun" }]}
         >
             <div className="max-w-3xl mx-auto space-y-6">
                 <div>

@@ -57,9 +57,8 @@ export default function ShortlinkAnalytics({
         <AppLayout
             title={`Statistik: ${shortlink.slug}`}
             breadcrumbs={[
-                { label: "Dashboard", href: "/dashboard" },
-                { label: "Tautan", href: "/shortlinks" },
-                { label: shortlink.slug, href: `/shortlinks/${shortlink.id}` },
+                { label: "Kelola Tautan", href: "/shortlinks" },
+                { label: `/${shortlink.slug}`, href: `/shortlinks/${shortlink.id}` },
                 { label: "Analisis" },
             ]}
         >

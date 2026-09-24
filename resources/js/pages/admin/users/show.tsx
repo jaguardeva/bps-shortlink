@@ -45,22 +45,21 @@ export default function UserShow({
         <AppLayout
             title={`Profil Pengguna: ${targetUser.name}`}
             breadcrumbs={[
-                { label: "Dashboard", href: "/dashboard" },
-                { label: "Pengguna", href: "/admin/users" },
+                { label: "Kelola Pengguna", href: "/admin/users" },
                 { label: targetUser.name },
             ]}
             actions={
                 <div className="flex items-center gap-2">
-                    <Button asChild variant="outline" size="sm" className="gap-2">
+                    <Button asChild variant="outline" size="sm" className="gap-1.5 h-8 sm:h-9">
                         <Link href={`/admin/analytics/users/${targetUser.id}`}>
                             <BarChart3 className="w-4 h-4" />
-                            <span>Statistik</span>
+                            <span className="hidden sm:inline">Statistik</span>
                         </Link>
                     </Button>
-                    <Button asChild size="sm" className="gap-2">
+                    <Button asChild size="sm" className="gap-1.5 h-8 sm:h-9">
                         <Link href={`/admin/users/${targetUser.id}/edit`}>
                             <Edit className="w-4 h-4" />
-                            <span>Edit Profil</span>
+                            <span className="hidden sm:inline">Edit Profil</span>
                         </Link>
                     </Button>
                 </div>
